@@ -3,6 +3,7 @@ package br.com.senai.core.service;
 import java.util.List;
 
 import br.com.senai.core.dao.DaoCategoria;
+import br.com.senai.core.dao.DaoRestaurante;
 import br.com.senai.core.dao.FactoryDao;
 import br.com.senai.core.domain.Categoria;
 
@@ -10,9 +11,10 @@ public class CategoriaService {
 
 	private DaoCategoria dao;
 	
+	private DaoRestaurante daoRestaurante; 
 	public CategoriaService() {
 		this.dao = FactoryDao.getInstance().getDaoCategoria();
-	}
+		this.daoRestaurante = FactoryDao.getInstance().getDaoRestaurante();	}
 	
 	public void salvar(Categoria categoria) {
 		this.validar(categoria);
@@ -27,6 +29,10 @@ public class CategoriaService {
 	
 	public void removerPor(int id) {
 		if(id > 0) {
+			int qtdeDeRestaurantes = daoRestaurante.contarPor(id);
+			if(qtdeDeRestaurantes > 0 ) {
+				throw new IllegalArgumentException("não foi possivel excluir a categoria" + "motivo: Existem:" + qtdeDeRestaurantes + "vinculados a categoria");
+			}
 			this.dao.excluirPor(id);
 		}else {
 			throw new IllegalArgumentException("O id da categoria deve ser maior que 0");
